@@ -18,25 +18,31 @@ def send_message(youtube, live_chat_id, message):
     try:
         youtube.liveChatMessages().insert(
             part="snippet",
-            body={"snippet": {"liveChatId": live_chat_id, "type": "textMessageEvent",
-                    "textMessageDetails": {"messageText": message}}}
+            body={"snippet": {"liveChatId": live_chat_id, "type": "textMessageEvent", "textMessageDetails": {"messageText": message}}}
         ).execute()
         print(f"📤 {message}")
     except Exception as e:
         print(f"خطأ إرسال: {e}")
 
+def wait_for_live(youtube):
+    while True:
+        try:
+            live = youtube.liveBroadcasts().list(part="snippet", broadcastStatus="active", mine=True).execute()
+            if live['items']:
+                live_chat_id = live['items'][0]['snippet']['liveChatId']
+                title = live['items'][0]['snippet']['title']
+                print(f"✅ متصل بالبث: {title}")
+                return live_chat_id
+            else:
+                print("⏳ مكاش بث مباشر... نستنى 30 ثانية")
+                time.sleep(30)
+        except Exception as e:
+            print(f"❌ خطأ جلب البث: {e}")
+            time.sleep(30)
+
 def start_chat_loop():
     youtube = get_youtube()
-    try:
-        live = youtube.liveBroadcasts().list(part="snippet", broadcastStatus="active").execute()
-        if not live['items']:
-            print("❌ مكاش بث مباشر شغال")
-            return
-        live_chat_id = live['items'][0]['snippet']['liveChatId']
-        print(f"✅ متصل بالبث: {live['items'][0]['snippet']['title']}")
-    except Exception as e:
-        print(f"❌ خطأ جلب البث: {e}")
-        return
+    live_chat_id = wait_for_live(youtube)
 
     send_message(youtube, live_chat_id, "✅ INFINITY GEN دخل للشات من قالمة 🚫💸 | اكتب متجر")
     next_page_token = None
@@ -44,7 +50,9 @@ def start_chat_loop():
     while True:
         try:
             response = youtube.liveChatMessages().list(
-                liveChatId=live_chat_id, part="snippet,authorDetails", pageToken=next_page_token
+                liveChatId=live_chat_id,
+                part="snippet,authorDetails",
+                pageToken=next_page_token
             ).execute()
 
             for item in response['items']:
@@ -52,13 +60,16 @@ def start_chat_loop():
                 author = item['authorDetails']['displayName']
                 author_id = item['authorDetails']['channelId']
                 print(f"💬 {author}: {msg}")
-
                 reply = handle_command(author_id, author, msg)
                 if reply:
                     send_message(youtube, live_chat_id, reply)
 
             next_page_token = response['nextPageToken']
             time.sleep(response['pollingIntervalMillis'] / 1000)
+
         except Exception as e:
             print(f"خطأ في اللوب: {e}")
+            if "liveChatId not found" in str(e):
+                live_chat_id = wait_for_live(youtube)
+                send_message(youtube, live_chat_id, "🔄 INFINITY GEN رجع للشات 🚫💸")
             time.sleep(10)
