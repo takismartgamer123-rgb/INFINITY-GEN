@@ -1,9 +1,25 @@
-import os, json, time, sys
-from google.oauth2.credentials import Credentials
-from google.auth.transport.requests import Request
-from googleapiclient.discovery import build
-from games import handle_command
 print("🔥🔥🔥 [FILE] بديت نقرا chat_handler.py")
+import os, json, time, sys
+print("🔥🔥🔥 [IMPORT-1] كملت import os,json,time,sys")
+
+from google.oauth2.credentials import Credentials
+print("🔥🔥🔥 [IMPORT-2] كملت import Credentials")
+
+from google.auth.transport.requests import Request
+print("🔥🔥🔥 [IMPORT-3] كملت import Request")
+
+from googleapiclient.discovery import build
+print("🔥🔥🔥 [IMPORT-4] كملت import build")
+
+from games import handle_command
+print("🔥🔥🔥 [IMPORT-5] كملت import games")
+
+SCOPES = ['https://www.googleapis.com/auth/youtube.force-ssl']
+print("🔥🔥🔥 [FILE] كملت نقرا الملف كامل")
+
+def get_youtube():
+    print("🔑 [AUTH-1] بديت نقرا TOKEN_JSON")
+    # ... باقي الكود لي عطيتهولك من قبلprint("🔥🔥🔥 [FILE] بديت نقرا chat_handler.py")
 import os, json, time, sys
 print("🔥🔥🔥 [IMPORT-1] كملت import os,json,time,sys")
 
