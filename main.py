@@ -27,10 +27,9 @@ def run_all_services():
     print("✅ بوت الشات انطلق")
 
 if __name__ == '__main__':
-    # شغل كل الخدمات في الخلفية
     run_all_services()
     
-    # هذا هو المفتاح - يخلي Render شغال 24/7 و ما يطفيكش
-    port = int(os.environ.get('PORT', 10000))
+    # هذا هو السطر لي كان فيه المشكل - صححناه
+    port = int(os.environ.get('PORT', '10000').strip())
     print(f"🌐 السيرفر شغال على البورت {port}")
     app.run(host='0.0.0.0', port=port)
